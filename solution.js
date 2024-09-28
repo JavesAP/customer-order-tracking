@@ -26,7 +26,7 @@ fs.createReadStream('orders.csv')
         } else {
           customerSpending.forEach((customer) => {
             if (customer.customerId === order.customer_id) {
-              customer.totalSpent = customer.totalSpent + Number(order.price_per_unit)
+              customer.totalSpent = Number(customer.totalSpent) + Number(order.price_per_unit)
             }
           })
         }
@@ -84,5 +84,34 @@ fs.createReadStream('orders.csv')
       console.log(mostPopularProduct)
     }
 
-    mostOrderedProduct(results)
+    // Part 3
+    // This function is similar to the others except when it pushes values if the value is ''
+    // an empty string then it is altered to be a space to stop inaccurate information
+    // Time complexity is n^2 and space complexity is constant
+    function monthlyRevenue(ordersArr) {
+      const revenueEachMonth = []
+      for (const order of ordersArr) {
+        let isIncluded = false
+        revenueEachMonth.forEach((month) => {
+          if (order.order_date.includes(month.year_month)) isIncluded = true
+        })
+        
+        if (!isIncluded) {
+          revenueEachMonth.push({
+            year_month: order.order_date === '' ? ' ' : order.order_date.slice(0,7), 
+            revenue: order.price_per_unit
+          })
+        } else {
+          revenueEachMonth.forEach((month) => {
+            if (order.order_date.includes(month.year_month)) {
+              month.revenue = String(Number(month.revenue) + Number(order.price_per_unit))
+            }
+          })
+        }
+      }
+      revenueEachMonth.sort((a,b) => b.revenue - a.revenue)
+      console.log(revenueEachMonth)
+    }
+
+    monthlyRevenue(results)
   });
